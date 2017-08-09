@@ -24,7 +24,6 @@ import org.junit.Test;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class ElasticOutputOperatorTest
 {
@@ -34,13 +33,16 @@ public class ElasticOutputOperatorTest
     String jsonString = "{\n" +
       "    \"cluster_name\": \"dt-cluster-0\",\n" +
       "    \"hosts\":  \"localhost:9300\",\n" +
-      "    \"batch_size\": 1000,\n" +
+      "    \"batch_size\": 5,\n" +
       "    \"flush_interval_ms\": 1000,\n" +
       "    \"type_mappings\": {\n" +
       "        \"user\": {\n" +
       "            \"properties\": {\n" +
       "                \"name\": {\n" +
-      "                    \"type\": \"string\"\n" +
+      "                    \"type\": \"text\"\n" +
+      "                },\n" +
+      "                \"salary\": {\n" +
+      "                    \"type\": \"long\"\n" +
       "                }\n" +
       "            }\n" +
       "        }\n" +
@@ -56,12 +58,13 @@ public class ElasticOutputOperatorTest
     operator.setup(null);
     for (int windowId = 1; windowId <= 5; windowId++) {
       operator.beginWindow(windowId);
-      for (int i = 0; i < 3; i++) {
+      for (int i = 0; i < 12; i++) {
         Map<String, Object> tuple = new HashMap<String, Object>();
         tuple.put("date", new Date());
         tuple.put("type", "user");
-        tuple.put("id", "001");
-        tuple.put("name", RandomStringUtils.random(5));
+        tuple.put("id", windowId + "." + i);
+        tuple.put("name", RandomStringUtils.randomAlphanumeric(5));
+        tuple.put("salary", (int) (Math.random() * 1000000));
         operator.processTuple(tuple);
       }
       operator.endWindow();

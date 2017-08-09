@@ -48,7 +48,7 @@ public class ElasticConfiguration
   private static final String BULK_RETRY_COUNT_kEY = "bulk_retry_count";
 
   private final String DEFAULT_INDEX_PREFIX = "dt-";
-  private final String DEFAULT_INDEX_PATTERN = "MM/dd/yyyy HH:mm:ss";
+  private final String DEFAULT_INDEX_PATTERN = "MM.dd.yyyy-HH:mm:ss";
   private final int DEFAULT_INDEX_SHARDS = 3;
   private final int DEFAULT_INDEX_REPLICAS = 2;
   private final int DEFAULT_BATCH_SIZE = 1000;

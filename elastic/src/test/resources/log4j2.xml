@@ -1,0 +1,28 @@
+<Configuration status="ERROR" name="example-config">
+    <Properties>
+        <Property name="LOG_DIR">/tmp/malhar-elastic/logs</Property>
+        <Property name="ARCHIVE">${LOG_DIR}/archive</Property>
+        <Property name="PATTERN">%-5level %d [%t] %c:%M(%L): %m%n</Property>
+    </Properties>
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="${PATTERN}"/>
+        </Console>
+
+        <RollingFile name="fileWriter"
+                     fileName="${LOG_DIR}/example1.log"
+                     filePattern="${ARCHIVE}/example1.log.%d{yyyy-MM-dd-hh-mm}.gz">
+            <PatternLayout pattern="${PATTERN}"/>
+            <TimeBasedTriggeringPolicy/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="fileWriter"/>
+        </Root>
+        <Logger name="com.andrew_flower.example.Log4j2Example1" level="TRACE" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Logger>
+        <Logger name="com.andrew_flower.example.Other" level="ERROR" additivity="true"/>
+    </Loggers>
+</Configuration>
