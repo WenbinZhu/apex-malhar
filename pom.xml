@@ -213,6 +213,7 @@
     <module>contrib</module>
     <module>kafka</module>
     <module>examples</module>
+    <module>elastic</module>
   </modules>
 
   <dependencies>
