@@ -19,41 +19,56 @@
 package org.apache.apex.malhar.elastic;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ElasticOutputOperatorTest
 {
+  private String configString = "{\n" +
+    "    \"cluster_name\": \"dt-cluster-0\",\n" +
+    "    \"hosts\":  \"localhost:9300\",\n" +
+    "    \"batch_size\": 5,\n" +
+    "    \"flush_interval_ms\": 1000,\n" +
+    "    \"type_mappings\": {\n" +
+    "        \"user\": {\n" +
+    "            \"properties\": {\n" +
+    "                \"name\": {\n" +
+    "                    \"type\": \"text\"\n" +
+    "                },\n" +
+    "                \"salary\": {\n" +
+    "                    \"type\": \"long\"\n" +
+    "                }\n" +
+    "            }\n" +
+    "        }\n" +
+    "    },\n" +
+    "    \"date_field\": \"date\",\n" +
+    "    \"type_field\": \"type\",\n" +
+    "    \"id_field\": \"id\"\n" +
+    "}";
+
+  @Test
+  public void testConfiguration()
+  {
+    ElasticConfiguration config = new ElasticConfiguration(configString);
+    Map<String, Map<String, String>> m = new TreeMap<>();
+    m.put("company", new TreeMap<String, String>());
+    m.get("company").put("name", "text");
+    m.get("company").put("profit", "double");
+    config.setTypeMappings(m);
+    String expect = "{\"properties\":{\"name\":\"text\",\"profit\":\"double\"}}";
+    Assert.assertEquals("Incorrect configuration",  expect, config.getTypeMappings().get("company"));
+  }
+
   @Test
   public void testDateIndexedOutput()
   {
-    String jsonString = "{\n" +
-      "    \"cluster_name\": \"dt-cluster-0\",\n" +
-      "    \"hosts\":  \"localhost:9300\",\n" +
-      "    \"batch_size\": 5,\n" +
-      "    \"flush_interval_ms\": 1000,\n" +
-      "    \"type_mappings\": {\n" +
-      "        \"user\": {\n" +
-      "            \"properties\": {\n" +
-      "                \"name\": {\n" +
-      "                    \"type\": \"text\"\n" +
-      "                },\n" +
-      "                \"salary\": {\n" +
-      "                    \"type\": \"long\"\n" +
-      "                }\n" +
-      "            }\n" +
-      "        }\n" +
-      "    }\n" +
-      "}";
-
-    ElasticConfiguration config = new ElasticConfiguration(jsonString);
+    ElasticConfiguration config = new ElasticConfiguration(configString);
     ElasticDateIndexOutputOperator operator = new ElasticDateIndexOutputOperator(config);
-    operator.setDateField("date");
-    operator.setTypeField("type");
-    operator.setIdField("id");
+    // operator.setDateField("date");
+    // operator.setTypeField("type");
+    // operator.setIdField("id");
 
     operator.setup(null);
     for (int windowId = 1; windowId <= 5; windowId++) {

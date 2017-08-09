@@ -59,6 +59,9 @@ public abstract class AbstractElasticDateIndexedOutputOperator<T extends Map<Str
     this.flushIntervalMS = config.getFlushIntervalMS();
     this.bulkRetryTimeMS = config.getBulkRetryTimeMS();
     this.bulkRetryCount = config.getBulkRetryCount();
+    this.dateField = config.getDateField();
+    this.typeField = config.getTypeField();
+    this.idField = config.getIdField();
   }
 
   @Override

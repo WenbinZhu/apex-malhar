@@ -46,6 +46,9 @@ public class ElasticConfiguration
   private static final String FLUSH_INTERVAL_MS_KEY = "flush_interval_ms";
   private static final String BULK_RETRY_TIME_MS_KEY = "bulk_retry_time_ms";
   private static final String BULK_RETRY_COUNT_kEY = "bulk_retry_count";
+  private static final String DATE_FIELD_KEY = "date_field";
+  private static final String TYPE_FIELD_KEY = "type_field";
+  private static final String ID_FIELD_KEY = "id_field";
 
   private final String DEFAULT_INDEX_PREFIX = "dt-";
   private final String DEFAULT_INDEX_PATTERN = "MM.dd.yyyy-HH:mm:ss";
@@ -69,6 +72,10 @@ public class ElasticConfiguration
   private int flushIntervalMS;
   private int bulkRetryTimeMS;
   private int bulkRetryCount;
+  private String dateField;
+  private String typeField;
+  private String idField;
+
 
   public ElasticConfiguration(JSONObject jsonConfig)
   {
@@ -85,8 +92,8 @@ public class ElasticConfiguration
       DTThrowable.rethrow(ex);
     }
 
-    this.clusterName = jsonConfig.optString(CLUSTER_NAME_KEY, "");
-    this.hosts = jsonConfig.optString(HOSTS_KEY, "");
+    this.clusterName = jsonConfig.optString(CLUSTER_NAME_KEY, null);
+    this.hosts = jsonConfig.optString(HOSTS_KEY, null);
     this.indexPrefix = jsonConfig.optString(INDEX_PREFIX_KEY, DEFAULT_INDEX_PREFIX);
     this.indexPattern = jsonConfig.optString(INDEX_PATTERN_KEY, DEFAULT_INDEX_PATTERN);
     this.indexShards = jsonConfig.optInt(INDEX_SHARDS_KEY, DEFAULT_INDEX_SHARDS);
@@ -96,6 +103,9 @@ public class ElasticConfiguration
     this.flushIntervalMS = jsonConfig.optInt(FLUSH_INTERVAL_MS_KEY, DEFAULT_FLUSH_INTERVAL_MS);
     this.bulkRetryTimeMS = jsonConfig.optInt(BULK_RETRY_TIME_MS_KEY, DEFAULT_BULK_RETRY_TIME_MS);
     this.bulkRetryCount = jsonConfig.optInt(BULK_RETRY_COUNT_kEY, DEFAULT_BULK_RETRY_COUNT);
+    this.dateField = jsonConfig.optString(DATE_FIELD_KEY, null);
+    this.typeField = jsonConfig.optString(TYPE_FIELD_KEY, null);
+    this.idField = jsonConfig.optString(ID_FIELD_KEY, null);
 
     // Parse field type mappings
     JSONObject typeMappingsObj = jsonConfig.optJSONObject(TYPE_MAPPINGS_KEY);
@@ -108,6 +118,24 @@ public class ElasticConfiguration
         JSONObject mapping = typeMappingsObj.optJSONObject(type);
         typeMappings.put(type, mapping.toString());
       }
+    }
+  }
+
+  public void setTypeMappings(Map<String, Map<String, String>> mappings)
+  {
+    typeMappings = new HashMap<>();
+
+    for (Map.Entry<String, Map<String, String>> entry : mappings.entrySet()) {
+      Map<String, Map<String, String>> properties = new HashMap<>();
+      properties.put("properties", entry.getValue());
+      JSONObject typeObj = new JSONObject();
+      try {
+        typeObj.put("properties", new JSONObject(entry.getValue()));
+      } catch (JSONException ex) {
+        logger.error("Unable to set type mappings", ex);
+        DTThrowable.rethrow(ex);
+      }
+      typeMappings.put(entry.getKey(), typeObj.toString());
     }
   }
 
@@ -169,5 +197,20 @@ public class ElasticConfiguration
   public int getBulkRetryCount()
   {
     return bulkRetryCount;
+  }
+
+  public String getDateField()
+  {
+    return dateField;
+  }
+
+  public String getTypeField()
+  {
+    return typeField;
+  }
+
+  public String getIdField()
+  {
+    return idField;
   }
 }
