@@ -31,7 +31,7 @@
 
     <artifactId>malhar-elastic</artifactId>
     <name>Apache Apex Malhar Elasticsearch Support</name>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <properties>
         <checkstyle.console>false</checkstyle.console>
@@ -39,6 +39,22 @@
 
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
             <!-- Publish tests jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -47,7 +63,7 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>test-jar</goal>
+                            <goal>jar</goal>
                         </goals>
                         <phase>package</phase>
                     </execution>
@@ -191,14 +207,12 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.7</version>
-            <scope>test</scope>
+            <version>2.8.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.7</version>
-            <scope>test</scope>
+            <version>2.8.2</version>
         </dependency>
         <dependency>
             <groupId>org.elasticsearch.client</groupId>

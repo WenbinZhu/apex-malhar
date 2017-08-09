@@ -18,40 +18,57 @@
  */
 package org.apache.apex.malhar.elastic;
 
-import org.apache.commons.lang.RandomStringUtils;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.*;
+import org.apache.commons.lang.RandomStringUtils;
+
+import com.cedarsoftware.util.io.JsonWriter;
 
 public class ElasticOutputOperatorTest
 {
-  private String configString = "{\n" +
-    "    \"cluster_name\": \"dt-cluster-0\",\n" +
-    "    \"hosts\":  \"localhost:9300\",\n" +
-    "    \"batch_size\": 5,\n" +
-    "    \"flush_interval_ms\": 1000,\n" +
-    "    \"type_mappings\": {\n" +
-    "        \"user\": {\n" +
-    "            \"properties\": {\n" +
-    "                \"name\": {\n" +
-    "                    \"type\": \"text\"\n" +
-    "                },\n" +
-    "                \"salary\": {\n" +
-    "                    \"type\": \"long\"\n" +
-    "                }\n" +
-    "            }\n" +
-    "        }\n" +
-    "    },\n" +
-    "    \"date_field\": \"date\",\n" +
-    "    \"type_field\": \"type\",\n" +
-    "    \"id_field\": \"id\"\n" +
-    "}";
+  private JSONObject makeJsonConfig()
+  {
+    JSONObject config = new JSONObject();
+    try {
+      config.put("cluster_name", "dt-cluster-0");
+      config.put("hosts", "localhost:9300");
+      config.put("batch_size", 5);
+      config.put("flush_interval_ms", 1000);
+      config.put("date_field", "date");
+      config.put("type_field", "type");
+      config.put("id_field", "id");
+      config.put("type_mappings", new JSONObject());
+      config.getJSONObject("type_mappings").put("user", new JSONObject());
+      config.getJSONObject("type_mappings").getJSONObject("user").put("properties", new JSONObject());
+      config.getJSONObject("type_mappings").getJSONObject("user").getJSONObject("properties").put("name", new JSONObject());
+      config.getJSONObject("type_mappings").getJSONObject("user").getJSONObject("properties").getJSONObject("name").put("type", "text");
+      config.getJSONObject("type_mappings").getJSONObject("user").getJSONObject("properties").put("salary", new JSONObject());
+      config.getJSONObject("type_mappings").getJSONObject("user").getJSONObject("properties").getJSONObject("salary").put("type", "long");
+    } catch (JSONException ex) {
+      throw new RuntimeException(ex);
+    }
+
+    return config;
+  }
+
+  private String getJsonConfigString(JSONObject jsonConfig)
+  {
+    return JsonWriter.formatJson(jsonConfig.toString());
+  }
 
   @Test
   public void testConfiguration()
   {
-    ElasticConfiguration config = new ElasticConfiguration(configString);
+    JSONObject jsonConfig = makeJsonConfig();
+    ElasticConfiguration config = new ElasticConfiguration(jsonConfig);
     Map<String, Map<String, String>> m = new TreeMap<>();
     m.put("company", new TreeMap<String, String>());
     m.get("company").put("name", "text");
@@ -64,7 +81,8 @@ public class ElasticOutputOperatorTest
   @Test
   public void testDateIndexedOutput()
   {
-    ElasticConfiguration config = new ElasticConfiguration(configString);
+    JSONObject jsonConfig = makeJsonConfig();
+    ElasticConfiguration config = new ElasticConfiguration(jsonConfig);
     ElasticDateIndexOutputOperator operator = new ElasticDateIndexOutputOperator(config);
     // operator.setDateField("date");
     // operator.setTypeField("type");
@@ -79,7 +97,7 @@ public class ElasticOutputOperatorTest
         tuple.put("type", "user");
         tuple.put("id", windowId + "." + i);
         tuple.put("name", RandomStringUtils.randomAlphanumeric(5));
-        tuple.put("salary", (int) (Math.random() * 1000000));
+        tuple.put("salary", (int)(Math.random() * 1000000));
         operator.processTuple(tuple);
       }
       operator.endWindow();

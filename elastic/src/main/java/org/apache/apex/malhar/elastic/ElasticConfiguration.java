@@ -51,9 +51,9 @@ public class ElasticConfiguration
   private static final String ID_FIELD_KEY = "id_field";
 
   private final String DEFAULT_INDEX_PREFIX = "dt-";
-  private final String DEFAULT_INDEX_PATTERN = "MM.dd.yyyy-HH:mm:ss";
-  private final int DEFAULT_INDEX_SHARDS = 3;
-  private final int DEFAULT_INDEX_REPLICAS = 2;
+  private final String DEFAULT_INDEX_PATTERN = "yyMMddHH";
+  private final int DEFAULT_INDEX_SHARDS = 18;
+  private final int DEFAULT_INDEX_REPLICAS = 1;
   private final int DEFAULT_BATCH_SIZE = 1000;
   private final int DEFAULT_BULK_SIZE_MB = 5;
   private final int DEFAULT_FLUSH_INTERVAL_MS = 5000;
