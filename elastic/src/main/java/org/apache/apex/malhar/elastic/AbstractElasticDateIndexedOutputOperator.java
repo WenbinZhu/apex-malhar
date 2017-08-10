@@ -119,7 +119,7 @@ public abstract class AbstractElasticDateIndexedOutputOperator<T extends Map<Str
   @Override
   protected String getIdByTuple(T tuple)
   {
-    return (idField == null || tuple.containsKey(idField)) ? null : (String)tuple.get(idField);
+    return (idField == null || !tuple.containsKey(idField)) ? null : (String)tuple.get(idField);
   }
 
   @Override
