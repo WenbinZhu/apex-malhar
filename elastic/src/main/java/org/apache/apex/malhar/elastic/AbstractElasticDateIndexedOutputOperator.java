@@ -35,9 +35,18 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import com.datatorrent.netlet.util.DTThrowable;
 
+/**
+ * Basic implementation of an output operator to send tuples which are
+ * indexed by date to Elasticsearch. <br>
+ *
+ * User can provide an index prefix and a date pattern like "MM.dd.YY",
+ * The operator will retrieve date from tuple and send tuple to the index
+ * which is the concatenation of the prefix and pattern.
+ *
+ * @param <T> tuple in map format
+ */
 public abstract class AbstractElasticDateIndexedOutputOperator<T extends Map<String, Object>> extends AbstractElasticOutputOperator<T>
 {
   private static final Logger logger = LoggerFactory.getLogger(AbstractElasticDateIndexedOutputOperator.class);
@@ -66,6 +75,12 @@ public abstract class AbstractElasticDateIndexedOutputOperator<T extends Map<Str
     this.idField = config.getIdField();
   }
 
+  /**
+   * Retrieve the date field in the tuple, create index in ElasticSearch
+   * if it does not exist, and create type mappings for this index.
+   *
+   * @param tuple tuple in map format
+   */
   @Override
   protected String getIndexByTuple(T tuple)
   {
@@ -99,6 +114,11 @@ public abstract class AbstractElasticDateIndexedOutputOperator<T extends Map<Str
     return null;
   }
 
+  /**
+   * Retrieve type field from the tuple.
+   *
+   * @param tuple tuple in map format
+   */
   @Override
   protected String getTypeByTuple(T tuple)
   {
@@ -116,12 +136,21 @@ public abstract class AbstractElasticDateIndexedOutputOperator<T extends Map<Str
     return null;
   }
 
+  /**
+   * Retrieve id field from the tuple.
+   *
+   * @param tuple tuple in map format
+   */
   @Override
   protected String getIdByTuple(T tuple)
   {
     return (idField == null || !tuple.containsKey(idField)) ? null : (String)tuple.get(idField);
   }
 
+  /* (non-Javadoc)
+   *
+   * @see org.apache.apex.malhar.elastic.AbstractElasticOutputOperator#setSource(org.elasticsearch.action.index.IndexRequest, T)
+   */
   @Override
   protected abstract IndexRequest setSource(IndexRequest indexRequest, T tuple);
 

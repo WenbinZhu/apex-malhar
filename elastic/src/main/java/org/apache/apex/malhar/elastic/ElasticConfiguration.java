@@ -30,6 +30,10 @@ import org.slf4j.LoggerFactory;
 
 import com.datatorrent.netlet.util.DTThrowable;
 
+/**
+ * ElasticSearch configuration in Json format.
+ *
+ */
 public class ElasticConfiguration
 {
   private static final Logger logger = LoggerFactory.getLogger(ElasticConfiguration.class);
@@ -76,7 +80,6 @@ public class ElasticConfiguration
   private String typeField;
   private String idField;
 
-
   public ElasticConfiguration(JSONObject jsonConfig)
   {
     this(jsonConfig.toString());
@@ -121,6 +124,12 @@ public class ElasticConfiguration
     }
   }
 
+  /**
+   * Set type mapping config if it is not specified when constructing configuration
+   *
+   * @param mappings map object represents for mappings for each type,
+   *                 format: Map<type, Map<fieldName, fieldType>
+   */
   public void setTypeMappings(Map<String, Map<String, String>> mappings)
   {
     typeMappings = new HashMap<>();

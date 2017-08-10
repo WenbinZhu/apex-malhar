@@ -35,6 +35,12 @@ import com.datatorrent.api.Context;
 import com.datatorrent.lib.db.AbstractStoreOutputOperator;
 import com.datatorrent.netlet.util.DTThrowable;
 
+/**
+ * Basic implementation of an output operator for ElasticSearch. <br>
+ * This class will create a bulk processor for processing tyuples in batch.
+ *
+ * @param <T> generic tuple
+ */
 public abstract class AbstractElasticOutputOperator<T> extends AbstractStoreOutputOperator<T, ElasticStore>
 {
   private static final Logger logger = LoggerFactory.getLogger(AbstractElasticOutputOperator.class);
@@ -50,7 +56,7 @@ public abstract class AbstractElasticOutputOperator<T> extends AbstractStoreOutp
   @Min(0)
   protected int bulkRetryCount = 3;
 
-  protected BulkProcessor bulkProcessor;
+  protected transient BulkProcessor bulkProcessor;
 
   protected AbstractElasticOutputOperator()
   {
@@ -61,6 +67,10 @@ public abstract class AbstractElasticOutputOperator<T> extends AbstractStoreOutp
     this.store = new ElasticStore(clusterName, hostAddrs);
   }
 
+  /**
+   * Create a transient bulk processor.
+   *
+   */
   @Override
   public void setup(Context.OperatorContext context)
   {
@@ -68,6 +78,10 @@ public abstract class AbstractElasticOutputOperator<T> extends AbstractStoreOutp
     createBulkProcessor();
   }
 
+  /**
+   * close the bulk processor.
+   *
+   */
   @Override
   public void teardown()
   {
@@ -75,6 +89,10 @@ public abstract class AbstractElasticOutputOperator<T> extends AbstractStoreOutp
     bulkProcessor.close();
   }
 
+  /**
+   * Flush the batch to ElasticSearch at the end of each window.
+   *
+   */
   @Override
   public void endWindow()
   {
@@ -82,6 +100,15 @@ public abstract class AbstractElasticOutputOperator<T> extends AbstractStoreOutp
     bulkProcessor.flush();
   }
 
+  /**
+   * Add tuple to the bulk processor. <br>
+   *
+   * The bulk processor will flush the batch automatically if <br>
+   * 1) The number of tuples in the batch reaches <b>batchSize</b> or <br>
+   * 2) <b>flushIntervalMS</b> has passed since last flush or <br>
+   * 3) The size of the batch reaches <b>bulkSizeMB</b>
+   *
+   */
   @Override
   public void processTuple(T tuple)
   {
@@ -136,12 +163,36 @@ public abstract class AbstractElasticOutputOperator<T> extends AbstractStoreOutp
       .build();
   }
 
+  /**
+   * User defined function for setting the index of the tuple to store to.
+   *
+   * @param tuple generic tuple
+   */
   protected abstract String getIndexByTuple(T tuple);
 
+  /**
+   * User defined function for setting the type of the tuple to store to.
+   *
+   * @param tuple generic tuple
+   */
   protected abstract String getTypeByTuple(T tuple);
 
+  /**
+   * User defined function for setting the index of the tuple. <br>
+   *
+   * This function can return null to indicate that there is no unique id for the tuple.
+   * In this case, ElasticSearch will add an auto-generated _id field to the document.
+   *
+   * @param tuple generic tuple
+   */
   protected abstract String getIdByTuple(T tuple);
 
+  /**
+   * User defined function to format the tuple to one of the source types supported by IndexRequest.
+   *
+   * @param indexRequest ElasticSearch index request object
+   * @param tuple generic tuple
+   */
   protected abstract IndexRequest setSource(IndexRequest indexRequest, T tuple);
 
   public void setBatchSize(int batchSize)

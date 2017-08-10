@@ -38,6 +38,10 @@ import org.apache.commons.lang.math.NumberUtils;
 import com.datatorrent.lib.db.Connectable;
 import com.datatorrent.netlet.util.DTThrowable;
 
+/**
+ * ElasticSearch base connector which connects to an ElasticSearch cluster.
+ *
+ */
 public class ElasticStore implements Connectable
 {
   private static final Logger logger = LoggerFactory.getLogger(ElasticStore.class);
@@ -50,12 +54,23 @@ public class ElasticStore implements Connectable
 
   protected TransportClient client;
 
+  /**
+   * Constructor for setting cluster name and host addresses.
+   *
+   * @param clusterName name of the cluster
+   * @param hostAddrs nodes addresses strings separated by comma,
+   *                  each address should be host:port
+   */
   public ElasticStore(String clusterName, String hostAddrs)
   {
     this.clusterName = clusterName;
     this.hostAddrs = hostAddrs;
   }
 
+  /* (non-Javadoc)
+   *
+   * @see com.datatorrent.lib.db.Connectable#connect()
+   */
   @Override
   public void connect() throws IOException
   {
@@ -84,6 +99,10 @@ public class ElasticStore implements Connectable
     }
   }
 
+  /* (non-Javadoc)
+   *
+   * @see com.datatorrent.lib.db.Connectable#disconnect()
+   */
   @Override
   public void disconnect() throws IOException
   {
@@ -92,6 +111,10 @@ public class ElasticStore implements Connectable
     }
   }
 
+  /* (non-Javadoc)
+   *
+   * @see com.datatorrent.lib.db.Connectable#isConnected()
+   */
   @Override
   public boolean isConnected()
   {
