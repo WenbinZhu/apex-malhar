@@ -107,6 +107,7 @@ public abstract class AbstractElasticDateIndexedOutputOperator<T extends Map<Str
 
           createTypeMappings(indicesAdminClient, tupleIndex);
         }
+        createdIndexes.add(tupleIndex);
       }
       return tupleIndex;
     }
