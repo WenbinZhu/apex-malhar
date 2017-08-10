@@ -104,10 +104,9 @@ public abstract class AbstractElasticOutputOperator<T> extends AbstractStoreOutp
    * Add tuple to the bulk processor. <br>
    *
    * The bulk processor will flush the batch automatically if <br>
-   * 1) The number of tuples in the batch reaches <b>batchSize</b> or <br>
-   * 2) <b>flushIntervalMS</b> has passed since last flush or <br>
-   * 3) The size of the batch reaches <b>bulkSizeMB</b>
-   *
+   * 1) The number of tuples in the batch reaches <code>batchSize</code> or <br>
+   * 2) <code>flushIntervalMS</code> has passed since last flush or <br>
+   * 3) The size of the batch reaches <code>bulkSizeMB</code>
    */
   @Override
   public void processTuple(T tuple)
