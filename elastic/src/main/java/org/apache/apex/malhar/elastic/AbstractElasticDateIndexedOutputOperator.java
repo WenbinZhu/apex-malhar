@@ -42,6 +42,8 @@ public abstract class AbstractElasticDateIndexedOutputOperator<T extends Map<Str
 {
   private static final Logger logger = LoggerFactory.getLogger(AbstractElasticDateIndexedOutputOperator.class);
 
+  private static final String DEFAULT_TUPLE_TYPE = "0";
+
   private String dateField;
   private String typeField;
   private String idField;
@@ -101,8 +103,7 @@ public abstract class AbstractElasticDateIndexedOutputOperator<T extends Map<Str
   protected String getTypeByTuple(T tuple)
   {
     if (typeField == null || !tuple.containsKey(typeField)) {
-      logger.error("Type field not found in tuple: {}", tuple.toString());
-      DTThrowable.rethrow(new Exception("Type field not found in tuple: " + tuple.toString()));
+      return DEFAULT_TUPLE_TYPE;
     } else {
       String tupleType = (String)tuple.get(typeField);
       if (!config.getTypeMappings().keySet().contains(tupleType)) {

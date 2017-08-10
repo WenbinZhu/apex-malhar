@@ -40,8 +40,15 @@ public class ElasticOutputOperatorTest
     try {
       config.put("cluster_name", "dt-cluster-0");
       config.put("hosts", "localhost:9300");
+      config.put("index_prefix", "dt-test-");
+      config.put("index_pattern", "yyMMddHH");
+      config.put("index_shards", 3);
+      config.put("index_replicas", 2);
       config.put("batch_size", 5);
+      config.put("bulk_size_mb", 5);
       config.put("flush_interval_ms", 1000);
+      config.put("bulk_retry_time_ms", 100);
+      config.put("bulk_retry_count", 2);
       config.put("date_field", "date");
       config.put("type_field", "type");
       config.put("id_field", "id");
